@@ -75,6 +75,12 @@ namespace SkyCoopClient
                 {
                     GUID = GUIDOBJ.GetPDID();
                 }
+                if (string.IsNullOrEmpty(GUID))
+                {
+                    // Opened without sync (see PlayersManager.TryInteract): keep its items locally instead of
+                    // uploading them under an empty GUID that every GUID-less container would share.
+                    return;
+                }
 
                 string JSON = Container.Serialize();
 

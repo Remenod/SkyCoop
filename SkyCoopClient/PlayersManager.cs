@@ -1448,6 +1448,13 @@ namespace SkyCoop
                 {
                     ContainerGUID = ObjGUID.GetPDID();
                 }
+                if (string.IsNullOrEmpty(ContainerGUID))
+                {
+                    // The server keeps container contents by GUID, and an empty one would be shared by every
+                    // container without a GUID. Leave this one to the game: it works, but is not synced.
+                    SkyCoop.Logger.Log(ConsoleColor.Yellow, $"Container {container.gameObject.name} has no GUID, opening it without sync");
+                    return false;
+                }
                 s_LastTryInteractionComponent = container;
                 SkyCoop.Logger.Log($"Container PerformHold {ContainerGUID}");
 

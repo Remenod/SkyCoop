@@ -637,6 +637,16 @@ namespace SkyCoopServer
             string GUID = Reader.GetString();
             bool BindItNow = Reader.GetBool();
 
+            if (string.IsNullOrEmpty(GUID))
+            {
+                // Object without a GUID: it cannot be locked for one player. Comparing "" below matched every
+                // player who is not in a car or not interacting, so such objects were refused whenever someone
+                // else was connected.
+                Logger.Log(ConsoleColor.Yellow, $"[ServerHandle] (ClientTryInteract) Client {Client.Id} interacts with an object without GUID, allowing without lock");
+                ServerSend.SendInteractResult(Client, true);
+                return;
+            }
+
             List<NetPeer> peers = new List<NetPeer>();
             ServerInstance.m_Instance.GetConnectedPeers(peers);
             foreach (NetPeer Peer in peers.ToArray())
