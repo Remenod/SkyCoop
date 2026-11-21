@@ -132,8 +132,8 @@ namespace SkyCoopServer
         }
 
         // Change this whenever the wire protocol changes, so mismatched builds refuse to connect
-        // instead of silently desyncing. "netsync1": player movement moved to the ClientTransform packet.
-        public const string c_Key = "public2-netsync1";
+        // instead of silently desyncing.
+        public const string c_Key = "public2-netsync2";
 
         public enum TypeVoice
         {
