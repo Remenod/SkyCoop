@@ -438,6 +438,7 @@ namespace SkyCoopServer
         public static void ClientLoadedScene(NetPeer Client, NetDataReader Reader, Server ServerInstance)
         {
             string SceneName = Reader.GetString();
+            bool NewGame = Reader.GetBool();
 
             PlayerData Data = ServerInstance.GetPlayerDataByNetPeer(Client);
 
@@ -567,6 +568,22 @@ namespace SkyCoopServer
             }
 
             DataStr.V3Quat Point = ServerInstance.m_ScenesData.GetSpawnPoint(SceneName, Client.Id);
+
+            // Survival scenes have no spawn points, so a new character would stay wherever the game put it.
+            // Start it on someone already playing on this scene. A zero position means that player has only
+            // just spawned and has not sent a real one yet.
+            if (NewGame && Point.m_Position == Vector3.Zero)
+            {
+                foreach (PlayerData Other in PlayersDataManager.GetPlayersOnScene(SceneName, ServerInstance))
+                {
+                    if (Other.m_PlayerID != Client.Id && Other.m_Position != Vector3.Zero)
+                    {
+                        Point = new DataStr.V3Quat { m_Position = Other.m_Position, m_Rotation = Other.m_Rotation };
+                        break;
+                    }
+                }
+            }
+
             ServerInstance.m_PlayersData.PlayerMoved(Client.Id, Point.m_Position);
             ServerInstance.m_PlayersData.PlayerRotated(Client.Id, Point.m_Rotation);
 

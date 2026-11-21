@@ -18,6 +18,7 @@ namespace SkyCoop
         public static string s_PendingSquadInvite = "";
         public static int s_LastMultiplayerWorldSeed = 0;
         public static GameModeConfig s_LastMultiplayerGameMode = null;
+        public static bool s_StartingNewGame = false;
         public static string s_ExperienceModeToHost = "Stalker";
         public static string s_GameModeModeToHost = "Sandbox";
         public static string s_ServerNameToHost = "Nameless";

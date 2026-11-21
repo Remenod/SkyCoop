@@ -262,7 +262,13 @@ namespace SkyCoop
                 {
                     if(Client != null && Client.m_IsReady)
                     {
-                        ClientSend.SendNewScene(GetCurrentSceneName());
+                        string Scene = GetCurrentSceneName();
+                        bool NewGame = MenuHook.s_StartingNewGame && IsGameplayScene(Scene);
+                        if (NewGame)
+                        {
+                            MenuHook.s_StartingNewGame = false;
+                        }
+                        ClientSend.SendNewScene(Scene, NewGame);
                         PlayersManager.s_ForceUpdateClothing = true; // Фикс отправки одежды после загрузки сохранения
                     }
                 }
@@ -330,6 +336,7 @@ namespace SkyCoop
             MenuHook.s_LastMultiplayerGameMode = SelectedMode;
 
             int SaveIndex = MenuHook.FindSaveForSeed(Seed);
+            MenuHook.s_StartingNewGame = SaveIndex == -1 && string.IsNullOrEmpty(SceneToSpawn);
 
             if(SaveIndex != -1)
             {

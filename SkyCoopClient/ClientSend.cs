@@ -273,12 +273,13 @@ namespace SkyCoop
 
             SendToHost(writer);
         }
-        public static void SendNewScene(string SceneName)
+        public static void SendNewScene(string SceneName, bool NewGame = false)
         {
             NetDataWriter writer = new NetDataWriter();
             writer.Put((int)Packet.Type.ClientLoadedScene);
 
             writer.Put(SceneName);
+            writer.Put(NewGame);
 
             SkyCoop.Logger.Log(ConsoleColor.Green, $"ClientSend.SendNewScene {SceneName}");
 
