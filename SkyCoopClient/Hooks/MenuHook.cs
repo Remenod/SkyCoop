@@ -529,6 +529,13 @@ namespace SkyCoop
             {
                 return;
             }
+            // OnCancel closes whatever dialog is on top and runs its cancel callback, which may belong to a
+            // panel that no longer exists. Only close our own waiting dialog.
+            Panel_Confirmation.ConfirmationRequest Current = Con.GetCurrentConfirmationRequest();
+            if (Current == null || Current.m_ConfirmationType != Panel_Confirmation.ConfirmationType.Waiting)
+            {
+                return;
+            }
             Con.OnCancel();
         }
 
@@ -789,6 +796,16 @@ namespace SkyCoop
 
                     if(Panel && Panel.GetNumUnlockedFeats() == 0)
                     {
+                        // The original method has just opened the "name your save" popup. Close it without its
+                        // cancel callback, which is main menu code: left open, the popup is carried into the game.
+                        Panel_Confirmation Con = InterfaceManager.GetPanel<Panel_Confirmation>();
+                        Panel_Confirmation.ConfirmationRequest NameSavePopup = Con ? Con.GetCurrentConfirmationRequest() : null;
+                        if (NameSavePopup != null && NameSavePopup.m_ConfirmationType == Panel_Confirmation.ConfirmationType.Rename)
+                        {
+                            NameSavePopup.m_EnableCallback = null;
+                            Con.OnCancel();
+                        }
+
                         GameManager.m_Instance.LaunchSandbox();
                         GameManager.m_SceneTransitionData.m_GameRandomSeed = s_LastMultiplayerWorldSeed;
                         SetMenuOverrideMode(SandboxMenuOverride.Original);
