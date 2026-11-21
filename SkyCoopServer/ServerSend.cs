@@ -78,7 +78,7 @@ namespace SkyCoopServer
             writer.Put((int)Packet.Type.ClientCrouch);
             writer.Put(FromClient);
             writer.Put(CrouchState);
-            Client.Send(writer, DeliveryMethod.Unreliable);
+            Client.Send(writer, DeliveryMethod.ReliableOrdered); // sent only on change, must not be lost
         }
 
         public static void SendPlayerAction(NetPeer Client, int Action, int FromClient)
@@ -88,7 +88,7 @@ namespace SkyCoopServer
             writer.Put((int)Packet.Type.ClientAction);
             writer.Put(FromClient);
             writer.Put(Action);
-            Client.Send(writer, DeliveryMethod.Unreliable);
+            Client.Send(writer, DeliveryMethod.ReliableOrdered); // sent only on change, must not be lost
         }
 
         public static void SendPlayerFire(NetPeer Client, int FromClient)
