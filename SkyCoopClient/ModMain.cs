@@ -401,31 +401,60 @@ namespace SkyCoop
             return UserName;
         }
 
-        public static string GenerateSeededGUID(int gameSeed, Vector3 v3)
+        /// <summary>
+        /// Deterministic GUID for scene objects that must get the same id on every client without a saved one
+        /// (scene transitions, vehicle doors). Hash of the world seed, a scope (object kind, maybe scene) and the
+        /// position rounded to centimetres, built with the invariant culture so the text is identical on every
+        /// machine. Never use string.GetHashCode() for this: it is randomized per process in .NET.
+        /// The hash is plain managed FNV-1a on purpose: this runs inside LoadScene.Start/VehicleDoor.Awake
+        /// patches, and an OS crypto provider (Wine under Proton) is one more thing that could throw there.
+        /// The previous version seeded a Random with x+y+z of the truncated position, so any two objects with
+        /// the same coordinate sum (for example two doors of one car) shared a GUID.
+        /// </summary>
+        public static string GenerateSeededGUID(int gameSeed, Vector3 v3, string scope)
         {
-            int _x = (int)v3.x;
-            int _y = (int)v3.y;
-            int _z = (int)v3.z;
-            int v3Int = _x + _y + _z;
-            int newSeed = gameSeed + v3Int;
-            string _chars = "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            System.Random newRNG = new System.Random(newSeed);
-            string newGUID = "";
-            for (int i = 1; i < 36; i++)
-            {
-                if (i == 9 || i == 14 || i == 19 || i == 24)
-                {
-                    newGUID = newGUID + "-";
-                }
-                int charIndex = newRNG.Next(0, _chars.Length);
-                newGUID = newGUID + _chars[charIndex];
-            }
-            return newGUID;
+            string Key = FormattableString.Invariant(
+                $"{gameSeed}|{scope}|{(long)System.Math.Round(v3.x * 100.0)}|{(long)System.Math.Round(v3.y * 100.0)}|{(long)System.Math.Round(v3.z * 100.0)}");
+            byte[] Data = Encoding.UTF8.GetBytes(Key);
+            ulong Low = Fnv1a64(Data, 14695981039346656037UL);
+            ulong High = Fnv1a64(Data, Low);
+            Span<byte> Bytes = stackalloc byte[16];
+            System.Buffers.Binary.BinaryPrimitives.WriteUInt64LittleEndian(Bytes, Low);
+            System.Buffers.Binary.BinaryPrimitives.WriteUInt64LittleEndian(Bytes.Slice(8), High);
+            return new System.Guid(Bytes).ToString();
         }
 
+        private static ulong Fnv1a64(byte[] Data, ulong Hash)
+        {
+            foreach (byte B in Data)
+            {
+                Hash ^= B;
+                Hash *= 1099511628211UL;
+            }
+            return Hash;
+        }
+
+        /// <summary>
+        /// Scope for GenerateSeededGUID: object kind plus the Unity scene the object lives in. Only for GUIDs that
+        /// stay on this client (scene transitions); GUIDs compared between players must not depend on sub-scene
+        /// names, which can differ with different DLC sets.
+        /// </summary>
+        public static string GetGuidScope(string Kind, GameObject Obj)
+        {
+            string SceneName = Obj ? Obj.scene.name : "";
+            return $"{Kind}|{SceneName}";
+        }
+
+        // Do not change the hash below: it seeds RandomSpawnObject choices and interior random rolls,
+        // so changing it would change which objects spawn in existing worlds.
         public static int GetDeterministicSeed(string guidString)
         {
             int seed = 17; // Простое начальное число
+
+            if (guidString == null)
+            {
+                return seed; // Same as an empty string. Was a NullReferenceException (seen in game logs).
+            }
 
             foreach (char c in guidString)
             {

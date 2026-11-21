@@ -1408,7 +1408,9 @@ namespace SkyCoop
                 {
                     ObjGUID = __instance.gameObject.AddComponent<ObjectGuid>();
                 }
-                PdidTable.RuntimeRegister(ObjGUID, ModMain.GenerateSeededGUID(0, __instance.m_ExitPoint.transform.position));
+                // Same id on every client: the server compares it to tell which seat is taken. So the scope has
+                // no sub-scene name (it can differ with different DLC sets); the rounded position is unique enough.
+                PdidTable.RuntimeRegister(ObjGUID, ModMain.GenerateSeededGUID(0, __instance.m_ExitPoint.transform.position, "VehicleDoor"));
             }
         }
 

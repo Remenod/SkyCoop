@@ -1266,7 +1266,14 @@ namespace SkyCoopClient
                 {
                     if (GameManager.m_SceneTransitionData != null)
                     {
-                        __result = (GameManager.m_SceneTransitionData.m_GameRandomSeed + ModMain.GetDeterministicSeed(GameManager.m_SceneTransitionData.m_SceneSaveFilenameCurrent)) ^ seed;
+                        string SceneName = GameManager.m_SceneTransitionData.m_SceneSaveFilenameCurrent;
+                        if (string.IsNullOrEmpty(SceneName))
+                        {
+                            // Happens while passing through the empty scene. Keep the game's own seed: this used to
+                            // throw a NullReferenceException, and the call then returned 0.
+                            return;
+                        }
+                        __result = (GameManager.m_SceneTransitionData.m_GameRandomSeed + ModMain.GetDeterministicSeed(SceneName)) ^ seed;
                     }
                 }
             }
@@ -1290,7 +1297,7 @@ namespace SkyCoopClient
                 }
                 else
                 {
-                    __instance.m_GUID = ModMain.GenerateSeededGUID(GameManager.m_SceneTransitionData.m_GameRandomSeed, __instance.gameObject.transform.position);
+                    __instance.m_GUID = ModMain.GenerateSeededGUID(GameManager.m_SceneTransitionData.m_GameRandomSeed, __instance.gameObject.transform.position, ModMain.GetGuidScope("LoadScene", __instance.gameObject));
                 }
                 if (__instance.m_TransitionOnContact)
                 {
@@ -1324,7 +1331,7 @@ namespace SkyCoopClient
                     return false;
                 __instance.m_StartHasBeenCalled = true;
 
-                __instance.m_GUID = ModMain.GenerateSeededGUID(GameManager.m_SceneTransitionData.m_GameRandomSeed, __instance.gameObject.transform.position);
+                __instance.m_GUID = ModMain.GenerateSeededGUID(GameManager.m_SceneTransitionData.m_GameRandomSeed, __instance.gameObject.transform.position, ModMain.GetGuidScope("LoadSceneParent", __instance.gameObject));
                 return false;
             }
         }
