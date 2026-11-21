@@ -1,0 +1,732 @@
+monoscripts indexed: 1274
+######## GEAR_PackMatches  (bundle 5c21e6c455f81af915584c6a69f43eda.bundle, typetree=True)
+[GO] GEAR_PackMatches active=True layer=17
+   - MB GearItem enabled=True
+   - MB FireStarterItem enabled=True
+   - MB StackableItem enabled=True
+   - MB Inspect enabled=True
+   - MB MatchesItem enabled=True
+       m_MinBurnTimeGametimeSeconds = 120
+       m_MaxBurnTimeGametimeSeconds = 180
+       m_BlowOutWindSpeedMPH = 20
+       m_IgniteDelaySeconds = 1
+       m_MatchesType = 1
+       m_IgniteAudioEvent = <Event>
+       m_BurnOutAudioEvent = <Event>
+       m_HUD = <PanelReference`1>
+       m_FireStartPanel = <PanelReference`1>
+   - MB FirstPersonItem enabled=True
+   - Rigidbody
+   - BoxCollider
+   - LODGroup
+   - MB HoverIconsToShow enabled=True
+   - MB DisableObjectForXPMode enabled=True
+  [GO] OBJ_CardboardMatches_LOD1 active=True layer=17
+     - MeshFilter
+     - MeshRenderer
+  [GO] OBJ_CardboardMatches_LOD0 active=True layer=17
+     - MeshFilter
+     - MeshRenderer
+  [GO] PickupHelper active=True layer=15
+     - CapsuleCollider
+  [GO] OBJ_CardboardMatches_Old active=False layer=17
+     - MeshFilter
+     - MeshRenderer
+######## GEAR_WoodMatches  (bundle 5c21e6c455f81af915584c6a69f43eda.bundle, typetree=True)
+[GO] GEAR_WoodMatches active=True layer=17
+   - MB GearItem enabled=True
+   - MB FireStarterItem enabled=True
+   - MB StackableItem enabled=True
+   - BoxCollider
+   - MB Inspect enabled=True
+   - MB MatchesItem enabled=True
+       m_MinBurnTimeGametimeSeconds = 180
+       m_MaxBurnTimeGametimeSeconds = 240
+       m_BlowOutWindSpeedMPH = 20
+       m_IgniteDelaySeconds = 1
+       m_MatchesType = 0
+       m_IgniteAudioEvent = <Event>
+       m_BurnOutAudioEvent = <Event>
+       m_HUD = <PanelReference`1>
+       m_FireStartPanel = <PanelReference`1>
+   - MB FirstPersonItem enabled=True
+   - Rigidbody
+   - LODGroup
+   - MB HoverIconsToShow enabled=True
+  [GO] OBJ_WoodMatches_LOD0 active=True layer=17
+     - MeshFilter
+     - MeshRenderer
+  [GO] OBJ_WoodMatches_LOD1 active=True layer=17
+     - MeshFilter
+     - MeshRenderer
+  [GO] PickupHelper active=True layer=15
+     - CapsuleCollider
+  [GO] OBJ_WoodMatches_Old active=False layer=17
+     - MeshFilter
+     - MeshRenderer
+######## GEAR_Flashlight  (bundle 5c21e6c455f81af915584c6a69f43eda.bundle, typetree=True)
+[GO] GEAR_Flashlight active=True layer=0
+  [GO] GEAR_Flashlight active=True layer=0
+     - MeshFilter
+     - MeshRenderer
+  [GO] Texture Group active=True layer=0
+######## GEAR_KeroseneLampB  (bundle 5c21e6c455f81af915584c6a69f43eda.bundle, typetree=True)
+[GO] GEAR_KeroseneLampB active=True layer=17
+   - MB GearItem enabled=True
+   - MB KeroseneLampItem enabled=True
+       m_MaxFuel = (m_Units=1000000000)
+       m_FuelBurnPerHour = (m_Units=250000000)
+       m_TurnOnEffectsDelay = 2.75
+       m_TurnOffDelay = 1
+       m_TurnOnEvent = <Event>
+       m_ExtinguishStartEvent = <Event>
+       m_TurnOffEvent = <Event>
+       m_LoopWithDelayEvent = <Event>
+       m_LoopEvent = <Event>
+       m_RefuelEvent = <Event>
+       m_RefuelTimeSeconds = 3
+       m_TurnOnEffectsTimer = 0
+       m_CurrentFuelLiters = (m_Units=0)
+       m_IntensityComponent = null
+       m_HUD = <PanelReference`1>
+       m_Color = (r=0, g=0, b=0, a=0)
+   - MB FirstPersonItem enabled=True
+   - MB Inspect enabled=True
+   - MB Harvest enabled=True
+   - MB Repairable enabled=True
+   - MB DegradeOnUse enabled=True
+   - Rigidbody
+   - BoxCollider
+   - MB KeroseneLampIntensity enabled=True
+       m_Intensity = 1
+       m_DynamicIntensity = 1
+       m_FlameRateMin = <AnimationCurve>
+       m_FlameRateMax = <AnimationCurve>
+       m_FlameColor = <Gradient>
+       m_IndoorIntensity = 2
+       m_OutdoorIntensity = 2
+       m_FillIntensity = 0
+       m_RimIntensity = 0
+       m_GlassColor = <Gradient>
+       m_FlameParticles = -> GameObject on 'LampFlame'
+       m_IndoorLight = -> MonoBehaviour on 'LightIndoor'
+       m_IndoorLightCore = -> MonoBehaviour on 'LightIndoorCore'
+       m_SelfLightFill = null
+       m_SelfLightRim = null
+       m_OutdoorLight = -> MonoBehaviour on 'LightOutdoor'
+       m_LitGlass = -> GameObject on 'KeroseneLampBGlassMesh'
+       m_Glass = -> GameObject on 'GEAR_KeroseneLampBGlass'
+       m_RadialGradient = null
+   - LODGroup
+   - MB HoverIconsToShow enabled=True
+   - MB DisableObjectForXPMode enabled=True
+   - MB HeatSource enabled=True
+       m_MaxTempIncrease = 3
+       m_MaxTempIncreaseInnerRadius = 0.5
+       m_MaxTempIncreaseOuterRadius = 2
+       m_TimeToReachMaxTempMinutes = 1
+       m_StartingTemp = 0
+       m_StartOn = 0
+       m_MaskTempIncrease = 0
+  [GO] FX active=True layer=17
+    [GO] LampFlame active=True layer=0
+       - ParticleSystem
+       - ParticleSystemRenderer
+       - MB ParticleRandomEmission enabled=True
+    [GO] LightOutdoor active=True layer=17
+       - Light enabled=1 type=2 intensity=2 range=20 spot=30 shadows=1 color=(0.99,0.67,0.37) cullMask=4294967295 renderMode=0
+       - MB LightTracking enabled=True
+       - MB LightQualitySwitch enabled=True
+    [GO] LightIndoor active=True layer=17
+       - Light enabled=1 type=2 intensity=2.4 range=25 spot=30 shadows=1 color=(1.00,0.67,0.37) cullMask=4294967295 renderMode=0
+       - MB LightTracking enabled=True
+       - MB LightQualitySwitch enabled=True
+    [GO] LightIndoorCore active=True layer=17
+       - Light enabled=1 type=0 intensity=8 range=0.12 spot=115.6 shadows=0 color=(1.00,0.67,0.37) cullMask=4294967295 renderMode=0
+       - MB LightTracking enabled=True
+  [GO] GEAR_KeroseneLampBGlass active=True layer=17
+     - Animator
+    [GO] KeroseneLampBGlassMesh active=True layer=17
+       - MeshFilter
+       - MeshRenderer
+  [GO] KeroseneLampB active=True layer=17
+     - MeshFilter
+     - MeshRenderer
+  [GO] PickupHelper active=True layer=15
+     - CapsuleCollider
+######## GEAR_Torch  (bundle 5c21e6c455f81af915584c6a69f43eda.bundle, typetree=True)
+[GO] GEAR_Torch active=True layer=17
+   - MB GearItem enabled=True
+   - MB FirstPersonItem enabled=True
+   - CapsuleCollider
+   - Rigidbody
+   - MB Inspect enabled=True
+   - MB TorchItem enabled=True
+       m_BurnLifetimeMinutes = 90
+       m_ExtinguishTime = 1
+       m_CanBeRelit = 1
+       m_CanBeHolstered = 1
+       m_LightRepositionRate = 1
+       m_LightHeightOffset = 1.5
+       m_TorchMeshGameObject = -> GameObject on 'TorchMesh'
+       m_TorchBurntMeshGameObject = -> GameObject on 'TorchBurntMesh'
+       m_FXGameObject = -> GameObject on 'FX'
+       m_IgniteAudio = Play_SndActionFireTorchLoop
+       m_ExtinguishAudio = Play_TorchExtinguishSwitch
+       m_BlownOutAudio = Play_TorchExtinguish
+       m_BurnOutAudio = Play_TorchExtinguish
+       m_LoopWithoutIgniteAudio = Play_SndActionFireTorchLoop
+       m_CollideAudio = Play_SmallWoodIpmact1
+       m_ThrowForce = 10
+       m_ThrowTorque = 15
+       m_WindSpeedCannotIgnite = 30
+       m_WindSpeedExtinguish = 40
+       m_StaminaDrainPerSecond = 2.5
+       m_ReduceLifetimeMinutesPerSwing = 10
+       m_RadialSpriteName = ico_torch
+       m_HUD = <PanelReference`1>
+       m_TorchLight = <PanelReference`1>
+       m_IntensityComponent = null
+       velDamp = 0
+       aVelDamp = 0
+       m_CanThrow = 0
+       m_Thrown = 0
+       m_ElapsedBurnMinutes = 0
+       m_Color = (r=0, g=0, b=0, a=0)
+   - MB Harvest enabled=True
+   - MB FuelSourceItem enabled=True
+   - MB FireStarterItem enabled=True
+   - MB TorchIntensity enabled=True
+       m_Intensity = 1
+       m_DynamicIntensity = 1
+       m_IntensityLerpSpeed = 0.01
+       m_SparkRate = <AnimationCurve>
+       m_SmokeRate = <AnimationCurve>
+       m_SmokeColor = <Gradient>
+       m_SmokeAlpha = <AnimationCurve>
+       m_SpriteSize = <AnimationCurve>
+       m_SpriteRateMin = <AnimationCurve>
+       m_SpriteRateMax = <AnimationCurve>
+       m_CoreSize = <AnimationCurve>
+       m_CoreRateMin = <AnimationCurve>
+       m_CoreRateMax = <AnimationCurve>
+       m_IndoorIntensityMin = <AnimationCurve>
+       m_IndoorIntensityMax = <AnimationCurve>
+       m_OutdoorIntensityMin = <AnimationCurve>
+       m_OutdoorIntensityMax = <AnimationCurve>
+       m_CoreParticles = -> GameObject on 'Core'
+       m_SparkParticles = -> GameObject on 'Sparks'
+       m_SmokeParticles = -> GameObject on 'Smoke'
+       m_SpriteParticles = -> GameObject on 'Sprite'
+       m_IndoorLight = -> GameObject on 'LightIndoor'
+       m_OutdoorLight = -> GameObject on 'LightOutdoor'
+       m_RadialGradient = -> GameObject on 'RadialGradient'
+   - LODGroup
+   - MB HoverIconsToShow enabled=True
+   - MB HeatSource enabled=True
+       m_MaxTempIncrease = 3
+       m_MaxTempIncreaseInnerRadius = 0.5
+       m_MaxTempIncreaseOuterRadius = 2
+       m_TimeToReachMaxTempMinutes = 1
+       m_StartingTemp = 0
+       m_StartOn = 0
+       m_MaskTempIncrease = 0
+   - NavMeshObstacle
+  [GO] TorchMesh active=True layer=17
+     - MeshFilter
+     - MeshRenderer
+  [GO] TorchBurntMesh active=True layer=17
+     - MeshFilter
+     - MeshRenderer
+  [GO] FX active=True layer=17
+    [GO] TorchFlame active=True layer=0
+      [GO] Sprite active=True layer=0
+         - ParticleSystemRenderer
+         - ParticleSystem
+         - MB ParticleRandomEmission enabled=True
+      [GO] Smoke active=True layer=0
+         - ParticleSystem
+         - ParticleSystemRenderer
+      [GO] Sparks active=True layer=0
+         - ParticleSystem
+         - ParticleSystemRenderer
+      [GO] Core active=True layer=0
+         - ParticleSystem
+         - ParticleSystemRenderer
+         - MB ParticleRandomEmission enabled=True
+    [GO] FX_SmokeTrailA_prefab active=False layer=0
+       - LineRenderer
+       - MB SmokeTrail enabled=True
+    [GO] LightOutdoor active=True layer=17
+       - Light enabled=1 type=2 intensity=1.2 range=10 spot=30 shadows=1 color=(0.92,0.23,0.23) cullMask=4294967295 renderMode=0
+       - MB LightFlickering enabled=True
+       - MB LightRandomIntensity enabled=True
+           m_IntervalSeconds = 0.2
+           m_Min = 0
+           m_Max = 1
+           m_AuroraLight = 0
+           m_NightOnly = 0
+           m_Fade = 0
+           m_FadeTime = 0
+       - MB LightTracking enabled=True
+       - MB LightQualitySwitch enabled=True
+    [GO] LightIndoor active=True layer=17
+       - Light enabled=1 type=2 intensity=4 range=8 spot=30 shadows=1 color=(0.92,0.23,0.23) cullMask=4294967295 renderMode=0
+       - MB LightFlickering enabled=True
+       - MB LightRandomIntensity enabled=True
+           m_IntervalSeconds = 0.2
+           m_Min = 0
+           m_Max = 1
+           m_AuroraLight = 0
+           m_NightOnly = 0
+           m_Fade = 0
+           m_FadeTime = 0
+       - MB LightTracking enabled=True
+       - MB LightQualitySwitch enabled=True
+    [GO] LightPosOriginal active=True layer=17
+  [GO] PlacementHelper active=True layer=15
+     - BoxCollider
+  [GO] RadialGradient active=True layer=29
+     - MeshFilter
+     - MeshRenderer
+  [GO] PickupHelper active=True layer=15
+     - CapsuleCollider
+######## GEAR_BlueFlare  (bundle 5c21e6c455f81af915584c6a69f43eda.bundle, typetree=True)
+[GO] GEAR_BlueFlare active=True layer=17
+   - MB GearItem enabled=True
+   - MB FlareItem enabled=True
+       m_Type = 1
+       m_BurnLifetimeMinutes = 15
+       m_LightRepositionRate = 1
+       m_LightHeightOffset = 1.5
+       m_IgniteDelaySeconds = 1
+       m_IgniteAudio = Play_BlueFlareLight
+       m_BurnOutAudio = Play_sndActionFireBlueFlareExtinguish1
+       m_LoopWithoutIgniteAudio = Play_BlueFlareLoop
+       m_CollideAudio = Play_SmallPlastic1_Flare
+       m_ThrowForce = 10
+       m_ThrowTorque = 15
+       m_StaminaDrainPerSecond = 2.5
+       m_ReduceLifetimeMinutesPerSwing = 0
+       m_HUD = <PanelReference`1>
+       m_RadialSpriteName = ico_units_flare
+       m_RuinedByWater = 0
+       m_IntensityComponent = null
+       velDamp = 0.03
+       aVelDamp = 0.01
+       m_CanThrow = 0
+       m_Thrown = 0
+       m_Color = (r=0, g=0, b=0, a=0)
+   - MB FirstPersonItem enabled=True
+   - CapsuleCollider
+   - Rigidbody
+   - MB Inspect enabled=True
+   - MB FireStarterItem enabled=True
+   - MB FlareIntensity enabled=True
+       m_Intensity = 1
+       m_DynamicIntensity = 1
+       m_SmokeRate = <AnimationCurve>
+       m_CoreRate = <AnimationCurve>
+       m_SparkRate = <AnimationCurve>
+       m_IndoorIntensityMin = <AnimationCurve>
+       m_IndoorIntensityMax = <AnimationCurve>
+       m_OutdoorIntensityMin = <AnimationCurve>
+       m_OutdoorIntensityMax = <AnimationCurve>
+       m_SmokeParticles = -> GameObject on 'Smoke'
+       m_CoreParticles = -> GameObject on 'Core'
+       m_SparkParticles = -> GameObject on 'Sparks'
+       m_IndoorLight = -> GameObject on 'LightIndoor'
+       m_OutdoorLight = -> GameObject on 'LightOutdoor'
+       m_RadialGradient = null
+   - LODGroup
+   - MB DespawnWhenRuined enabled=True
+   - MB HoverIconsToShow enabled=True
+   - MB HeatSource enabled=True
+       m_MaxTempIncrease = 3
+       m_MaxTempIncreaseInnerRadius = 1.5
+       m_MaxTempIncreaseOuterRadius = 2
+       m_TimeToReachMaxTempMinutes = 1
+       m_StartingTemp = 0
+       m_StartOn = 0
+       m_MaskTempIncrease = 0
+   - NavMeshObstacle
+  [GO] UncappedFlareMesh active=True layer=17
+     - MeshFilter
+     - MeshRenderer
+    [GO] FlareCapMesh active=True layer=17
+       - MeshFilter
+       - MeshRenderer
+      [GO] FX active=True layer=17
+        [GO] FlareSparks active=True layer=0
+           - ParticleSystem
+           - ParticleSystemRenderer
+          [GO] Sparks active=True layer=17
+             - ParticleSystem
+             - ParticleSystemRenderer
+          [GO] Smoke active=True layer=17
+             - ParticleSystemRenderer
+             - ParticleSystem
+          [GO] Core active=True layer=17
+             - ParticleSystem
+             - ParticleSystemRenderer
+        [GO] LightOutdoor active=True layer=17
+           - Light enabled=1 type=2 intensity=2 range=30 spot=30 shadows=1 color=(0.71,0.70,0.92) cullMask=4286578687 renderMode=1
+           - MB LightFlickering enabled=True
+           - MB LightRandomIntensity enabled=True
+               m_IntervalSeconds = 0.05
+               m_Min = 1.5
+               m_Max = 2.5
+               m_AuroraLight = 0
+               m_NightOnly = 0
+               m_Fade = 0
+               m_FadeTime = 0
+           - MB LightTracking enabled=True
+           - MB LightQualitySwitch enabled=True
+        [GO] LightIndoor active=True layer=17
+           - Light enabled=1 type=2 intensity=4 range=8 spot=30 shadows=1 color=(0.39,0.40,0.78) cullMask=4294967295 renderMode=0
+           - MB LightFlickering enabled=True
+           - MB LightRandomIntensity enabled=True
+               m_IntervalSeconds = 0.05
+               m_Min = 3
+               m_Max = 5
+               m_AuroraLight = 0
+               m_NightOnly = 0
+               m_Fade = 0
+               m_FadeTime = 0
+           - MB LightTracking enabled=True
+           - MB LightQualitySwitch enabled=True
+        [GO] LightPosOriginal active=True layer=17
+  [GO] PlacementHelper active=True layer=15
+     - BoxCollider
+  [GO] PickupHelper active=True layer=15
+     - CapsuleCollider
+######## GEAR_FlareA  (bundle 5c21e6c455f81af915584c6a69f43eda.bundle, typetree=True)
+[GO] GEAR_FlareA active=True layer=17
+   - MB GearItem enabled=True
+   - MB FlareItem enabled=True
+       m_Type = 0
+       m_BurnLifetimeMinutes = 60
+       m_LightRepositionRate = 1
+       m_LightHeightOffset = 1.5
+       m_IgniteDelaySeconds = 1
+       m_IgniteAudio = PLAY_FLARELIGHT
+       m_BurnOutAudio = PLAY_SNDACTIONFIREFLAREEXTINGUISH1
+       m_LoopWithoutIgniteAudio = Play_FlareLoop
+       m_CollideAudio = Play_SmallPlastic1_Flare
+       m_ThrowForce = 10
+       m_ThrowTorque = 15
+       m_StaminaDrainPerSecond = 2.5
+       m_ReduceLifetimeMinutesPerSwing = 0
+       m_HUD = <PanelReference`1>
+       m_RadialSpriteName = ico_units_flare
+       m_RuinedByWater = 1
+       m_IntensityComponent = null
+       velDamp = 0.03
+       aVelDamp = 0.01
+       m_CanThrow = 0
+       m_Thrown = 0
+       m_Color = (r=0, g=0, b=0, a=0)
+   - MB FirstPersonItem enabled=True
+   - CapsuleCollider
+   - Rigidbody
+   - MB Inspect enabled=True
+   - MB FireStarterItem enabled=True
+   - MB FlareIntensity enabled=True
+       m_Intensity = 1
+       m_DynamicIntensity = 1
+       m_SmokeRate = <AnimationCurve>
+       m_CoreRate = <AnimationCurve>
+       m_SparkRate = <AnimationCurve>
+       m_IndoorIntensityMin = <AnimationCurve>
+       m_IndoorIntensityMax = <AnimationCurve>
+       m_OutdoorIntensityMin = <AnimationCurve>
+       m_OutdoorIntensityMax = <AnimationCurve>
+       m_SmokeParticles = -> GameObject on 'Smoke'
+       m_CoreParticles = -> GameObject on 'Core'
+       m_SparkParticles = -> GameObject on 'Sparks'
+       m_IndoorLight = -> GameObject on 'LightIndoor'
+       m_OutdoorLight = -> GameObject on 'LightOutdoor'
+       m_RadialGradient = null
+   - LODGroup
+   - MB DespawnWhenRuined enabled=True
+   - MB HoverIconsToShow enabled=True
+   - MB DisableObjectForXPMode enabled=True
+   - MB HeatSource enabled=True
+       m_MaxTempIncrease = 3
+       m_MaxTempIncreaseInnerRadius = 1.5
+       m_MaxTempIncreaseOuterRadius = 2
+       m_TimeToReachMaxTempMinutes = 1
+       m_StartingTemp = 0
+       m_StartOn = 0
+       m_MaskTempIncrease = 0
+   - NavMeshObstacle
+  [GO] UncappedFlareMesh active=True layer=17
+     - MeshFilter
+     - MeshRenderer
+    [GO] FlareCapMesh active=True layer=17
+       - MeshFilter
+       - MeshRenderer
+      [GO] FX active=True layer=17
+        [GO] FlareSparks active=True layer=0
+           - ParticleSystem
+           - ParticleSystemRenderer
+          [GO] Sparks active=True layer=17
+             - ParticleSystem
+             - ParticleSystemRenderer
+          [GO] Smoke active=True layer=17
+             - ParticleSystemRenderer
+             - ParticleSystem
+          [GO] Core active=True layer=17
+             - ParticleSystem
+             - ParticleSystemRenderer
+        [GO] LightOutdoor active=True layer=17
+           - Light enabled=1 type=2 intensity=2 range=30 spot=30 shadows=1 color=(0.76,0.30,0.30) cullMask=4286578687 renderMode=1
+           - MB LightFlickering enabled=True
+           - MB LightRandomIntensity enabled=True
+               m_IntervalSeconds = 0.05
+               m_Min = 1.5
+               m_Max = 2.5
+               m_AuroraLight = 0
+               m_NightOnly = 0
+               m_Fade = 0
+               m_FadeTime = 0
+           - MB LightTracking enabled=True
+           - MB LightQualitySwitch enabled=True
+        [GO] LightIndoor active=True layer=17
+           - Light enabled=1 type=2 intensity=4 range=8 spot=30 shadows=1 color=(0.92,0.23,0.23) cullMask=4294967295 renderMode=0
+           - MB LightFlickering enabled=True
+           - MB LightRandomIntensity enabled=True
+               m_IntervalSeconds = 0.05
+               m_Min = 3
+               m_Max = 5
+               m_AuroraLight = 0
+               m_NightOnly = 0
+               m_Fade = 0
+               m_FadeTime = 0
+           - MB LightTracking enabled=True
+           - MB LightQualitySwitch enabled=True
+        [GO] LightPosOriginal active=True layer=17
+  [GO] PlacementHelper active=True layer=15
+     - BoxCollider
+  [GO] PickupHelper active=True layer=15
+     - CapsuleCollider
+######## GEAR_Flashlight  (bundle 5c21e6c455f81af915584c6a69f43eda.bundle, typetree=True)
+[GO] GEAR_Flashlight active=True layer=17
+   - MB GearItem enabled=True
+   - MB FlashlightItem enabled=True
+       m_Color = (r=0, g=0, b=0, a=0)
+       m_AuroraField = -> MonoBehaviour on 'GEAR_Flashlight_AuroraField'
+       m_FxObjectLow = -> GameObject on 'LowFX'
+       m_FxObjectHigh = -> GameObject on 'HighFX'
+       m_LightIndoor = -> Light on 'LightIndoors'
+       m_LightOutdoor = -> Light on 'LightOutdoors'
+       m_LightIndoorHigh = -> Light on 'LightIndoors'
+       m_LightOutdoorHigh = -> Light on 'LightOutdoors'
+       m_TurnOnAudioEvent = <Event>
+       m_TurnOffAudioEvent = <Event>
+       m_IntensityAudioEvent = <Event>
+       m_LowBeamDuration = 1
+       m_HighBeamDuration = 0.083333336
+       m_RechargeTime = 2
+       m_HighBeamCooldownSeconds = 0.5
+       m_AuroraFieldForwardOffset = 4
+       m_AuroraFieldVerticalOffset = -2
+       m_HUD = <PanelReference`1>
+   - MB FirstPersonItem enabled=True
+   - MB Inspect enabled=True
+   - MB Harvest enabled=True
+   - MB Repairable enabled=True
+   - MB DegradeOnUse enabled=True
+   - Rigidbody
+   - BoxCollider
+   - LODGroup
+   - MB HoverIconsToShow enabled=True
+   - MB DisableObjectForXPMode enabled=True
+  [GO] GEAR_Flashlight_AuroraField active=True layer=2
+     - MB AuroraField enabled=True
+     - SphereCollider
+     - SphereCollider
+  [GO] GEAR_KeroseneLampBGlass active=True layer=17
+     - Animator
+  [GO] Flashlight_mesh active=True layer=17
+     - MeshFilter
+     - MeshRenderer
+  [GO] FX active=True layer=17
+    [GO] LowFX active=False layer=17
+      [GO] LightIndoors active=True layer=2
+         - Light enabled=1 type=0 intensity=1 range=40 spot=55 shadows=1 color=(0.72,0.81,0.92) cullMask=4294967295 renderMode=0
+         - MB LightTracking enabled=True
+         - MB LightRandomIntensity enabled=True
+             m_IntervalSeconds = 0.15
+             m_Min = 2
+             m_Max = 4
+             m_AuroraLight = 0
+             m_NightOnly = 0
+             m_Fade = 0
+             m_FadeTime = 0
+         - MB LightQualitySwitch enabled=True
+      [GO] LightOutdoors active=True layer=2
+         - Light enabled=1 type=0 intensity=1 range=40 spot=55 shadows=1 color=(0.72,0.81,0.92) cullMask=4294967295 renderMode=0
+         - MB LightTracking enabled=True
+         - MB LightRandomIntensity enabled=True
+             m_IntervalSeconds = 0.15
+             m_Min = 2
+             m_Max = 4
+             m_AuroraLight = 0
+             m_NightOnly = 0
+             m_Fade = 0
+             m_FadeTime = 0
+         - MB LightQualitySwitch enabled=True
+      [GO] LightGlass active=True layer=2
+         - Light enabled=1 type=2 intensity=34.26 range=0.15 spot=46.5 shadows=0 color=(0.72,0.81,0.92) cullMask=4294967295 renderMode=0
+         - MB LightTracking enabled=True
+    [GO] HighFX active=False layer=17
+      [GO] LightIndoors active=True layer=2
+         - Light enabled=1 type=0 intensity=23.33 range=80 spot=55 shadows=1 color=(0.88,0.62,1.00) cullMask=4294967295 renderMode=0
+         - MB LightTracking enabled=True
+         - MB LightRandomIntensity enabled=True
+             m_IntervalSeconds = 0.15
+             m_Min = 10
+             m_Max = 20
+             m_AuroraLight = 0
+             m_NightOnly = 0
+             m_Fade = 0
+             m_FadeTime = 0
+         - MB LightQualitySwitch enabled=True
+      [GO] LightOutdoors active=True layer=2
+         - Light enabled=1 type=0 intensity=1 range=100 spot=55 shadows=1 color=(0.88,0.62,1.00) cullMask=4294967295 renderMode=0
+         - MB LightTracking enabled=True
+         - MB LightRandomIntensity enabled=True
+             m_IntervalSeconds = 0.15
+             m_Min = 10
+             m_Max = 20
+             m_AuroraLight = 0
+             m_NightOnly = 0
+             m_Fade = 0
+             m_FadeTime = 0
+         - MB LightQualitySwitch enabled=True
+      [GO] LightExtend active=True layer=2
+         - Light enabled=1 type=0 intensity=7.86 range=80 spot=98 shadows=1 color=(0.72,0.81,0.92) cullMask=4294967295 renderMode=0
+         - MB LightTracking enabled=True
+         - MB LightRandomIntensity enabled=True
+             m_IntervalSeconds = 0.15
+             m_Min = 5
+             m_Max = 10
+             m_AuroraLight = 0
+             m_NightOnly = 0
+             m_Fade = 0
+             m_FadeTime = 0
+         - MB LightQualitySwitch enabled=True
+      [GO] LightGlass active=True layer=2
+         - Light enabled=1 type=2 intensity=34.26 range=0.15 spot=46.5 shadows=0 color=(0.72,0.81,0.92) cullMask=4294967295 renderMode=0
+         - MB LightTracking enabled=True
+######## GEAR_BlueFlare  (bundle 6fae4f0f176502c1728a5ec8aa8bc643.bundle, typetree=True)
+[GO] GEAR_BlueFlare active=True layer=17
+   - MB GearItem enabled=True
+   - MB FlareItem enabled=True
+       m_Type = 1
+       m_BurnLifetimeMinutes = 15
+       m_LightRepositionRate = 1
+       m_LightHeightOffset = 1.5
+       m_IgniteDelaySeconds = 1
+       m_IgniteAudio = Play_BlueFlareLight
+       m_BurnOutAudio = Play_sndActionFireBlueFlareExtinguish1
+       m_LoopWithoutIgniteAudio = Play_BlueFlareLoop
+       m_CollideAudio = Play_SmallPlastic1_Flare
+       m_ThrowForce = 10
+       m_ThrowTorque = 15
+       m_StaminaDrainPerSecond = 2.5
+       m_ReduceLifetimeMinutesPerSwing = 0
+       m_HUD = <PanelReference`1>
+       m_RadialSpriteName = ico_units_flare
+       m_RuinedByWater = 0
+       m_IntensityComponent = null
+       velDamp = 0.03
+       aVelDamp = 0.01
+       m_CanThrow = 0
+       m_Thrown = 0
+       m_Color = (r=0, g=0, b=0, a=0)
+   - MB FirstPersonItem enabled=True
+   - CapsuleCollider
+   - Rigidbody
+   - MB Inspect enabled=True
+   - MB FireStarterItem enabled=True
+   - MB FlareIntensity enabled=True
+       m_Intensity = 1
+       m_DynamicIntensity = 1
+       m_SmokeRate = <AnimationCurve>
+       m_CoreRate = <AnimationCurve>
+       m_SparkRate = <AnimationCurve>
+       m_IndoorIntensityMin = <AnimationCurve>
+       m_IndoorIntensityMax = <AnimationCurve>
+       m_OutdoorIntensityMin = <AnimationCurve>
+       m_OutdoorIntensityMax = <AnimationCurve>
+       m_SmokeParticles = -> GameObject on 'Smoke'
+       m_CoreParticles = -> GameObject on 'Core'
+       m_SparkParticles = -> GameObject on 'Sparks'
+       m_IndoorLight = -> GameObject on 'LightIndoor'
+       m_OutdoorLight = -> GameObject on 'LightOutdoor'
+       m_RadialGradient = null
+   - LODGroup
+   - MB DespawnWhenRuined enabled=True
+   - MB HoverIconsToShow enabled=True
+   - MB HeatSource enabled=True
+       m_MaxTempIncrease = 3
+       m_MaxTempIncreaseInnerRadius = 1.5
+       m_MaxTempIncreaseOuterRadius = 2
+       m_TimeToReachMaxTempMinutes = 1
+       m_StartingTemp = 0
+       m_StartOn = 0
+       m_MaskTempIncrease = 0
+   - NavMeshObstacle
+  [GO] UncappedFlareMesh active=True layer=17
+     - MeshFilter
+     - MeshRenderer
+    [GO] FlareCapMesh active=True layer=17
+       - MeshFilter
+       - MeshRenderer
+      [GO] FX active=True layer=17
+        [GO] FlareSparks active=True layer=0
+           - ParticleSystem
+           - ParticleSystemRenderer
+          [GO] Sparks active=True layer=17
+             - ParticleSystem
+             - ParticleSystemRenderer
+          [GO] Smoke active=True layer=17
+             - ParticleSystemRenderer
+             - ParticleSystem
+          [GO] Core active=True layer=17
+             - ParticleSystem
+             - ParticleSystemRenderer
+        [GO] LightOutdoor active=True layer=17
+           - Light enabled=1 type=2 intensity=2 range=30 spot=30 shadows=1 color=(0.71,0.70,0.92) cullMask=4286578687 renderMode=1
+           - MB LightFlickering enabled=True
+           - MB LightRandomIntensity enabled=True
+               m_IntervalSeconds = 0.05
+               m_Min = 1.5
+               m_Max = 2.5
+               m_AuroraLight = 0
+               m_NightOnly = 0
+               m_Fade = 0
+               m_FadeTime = 0
+           - MB LightTracking enabled=True
+           - MB LightQualitySwitch enabled=True
+        [GO] LightIndoor active=True layer=17
+           - Light enabled=1 type=2 intensity=4 range=8 spot=30 shadows=1 color=(0.39,0.40,0.78) cullMask=4294967295 renderMode=0
+           - MB LightFlickering enabled=True
+           - MB LightRandomIntensity enabled=True
+               m_IntervalSeconds = 0.05
+               m_Min = 3
+               m_Max = 5
+               m_AuroraLight = 0
+               m_NightOnly = 0
+               m_Fade = 0
+               m_FadeTime = 0
+           - MB LightTracking enabled=True
+           - MB LightQualitySwitch enabled=True
+        [GO] LightPosOriginal active=True layer=17
+  [GO] PlacementHelper active=True layer=15
+     - BoxCollider
+  [GO] PickupHelper active=True layer=15
+     - CapsuleCollider
+not found: 

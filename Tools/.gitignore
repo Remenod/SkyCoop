@@ -1,0 +1,5 @@
+bin/
+obj/
+out/
+# The root .gitignore ignores *.csproj (Unity template); these tool projects must be kept.
+!*.csproj

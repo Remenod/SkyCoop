@@ -898,6 +898,8 @@ namespace SkyCoopClient
                             break;
                     }
                 }
+                // Lit kerosene lamp or flashlight left on the ground (no effect on other items).
+                Style = SkyCoop.RemoteLightSource.GetDroppedStyle(gear, Style);
 
                 Vector3 v3 = gear.gameObject.transform.position;
                 Quaternion rot = gear.gameObject.transform.rotation;
@@ -1107,6 +1109,12 @@ namespace SkyCoopClient
                 }
 
                 GearComp.m_Style = Data.m_Style;
+
+                SkyCoop.RemoteLightSource LightRig = GearComp.GetComponent<SkyCoop.RemoteLightSource>();
+                if (LightRig)
+                {
+                    LightRig.SetMode(Data.m_Style);
+                }
 
                 if (GearComp.m_CookingVisual)
                 {

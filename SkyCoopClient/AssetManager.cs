@@ -121,6 +121,14 @@ namespace SkyCoop
                         return null;
                     }
 
+                    // Lamps and flashlights on the ground: Style 1 lit, 2 flashlight high beam.
+                    // Torches and flares keep their own Style handling below. Must run before the strip loop.
+                    RemoteLightSource LightRig = RemoteLightSource.TryAttach(GearObject, Prefab, false);
+                    if (LightRig)
+                    {
+                        LightRig.SetMode(Style);
+                    }
+
                     if (gi.m_CookingPotItem)
                     {
                         Comps.GearCookingVisual Cooking = GearObject.AddComponent<GearCookingVisual>();
@@ -254,7 +262,8 @@ namespace SkyCoop
                             && ComName != Il2CppType.Of<TorchItem>().Name
                             && ComName != Il2CppType.Of<TorchIntensity>().Name
                             && ComName != Il2CppType.Of<HeatSource>().Name
-                            && ComName != Il2CppType.Of<NavMeshObstacle>().Name)
+                            && ComName != Il2CppType.Of<NavMeshObstacle>().Name
+                            && ComName != Il2CppType.Of<RemoteLightSource>().Name)
                         {
                             UnityEngine.Object.Destroy(Com);
                         }
@@ -294,7 +303,8 @@ namespace SkyCoop
             return null;
         }
 
-        public static GameObject CreateBogusGear(string GearName, Transform parent = null, bool RemoveColiders = false)
+        /// <param name="HeldLightRig">Placeholder for another player's hands: add a RemoteLightSource if the item gives light.</param>
+        public static GameObject CreateBogusGear(string GearName, Transform parent = null, bool RemoveColiders = false, bool HeldLightRig = false)
         {
             GameObject Prefab = GetAssetFromGame<GameObject>(GearName);
             if (Prefab)
@@ -303,6 +313,11 @@ namespace SkyCoop
                 if (GearObject)
                 {
                     GearObject.name = GearName;
+                    if (HeldLightRig)
+                    {
+                        // Must run before the item components below are stripped: it reads their light references.
+                        RemoteLightSource.TryAttach(GearObject, Prefab, true);
+                    }
                     foreach (Component Com in GearObject.GetComponents<Component>())
                     {
                         string ComName = Com.GetIl2CppType().Name;
@@ -325,7 +340,8 @@ namespace SkyCoop
                             && ComName != Il2CppType.Of<TorchItem>().Name
                             && ComName != Il2CppType.Of<TorchIntensity>().Name
                             && ComName != Il2CppType.Of<HeatSource>().Name
-                            && ComName != Il2CppType.Of<NavMeshObstacle>().Name)
+                            && ComName != Il2CppType.Of<NavMeshObstacle>().Name
+                            && ComName != Il2CppType.Of<RemoteLightSource>().Name)
                         {
                             UnityEngine.Object.Destroy(Com);
                         }
