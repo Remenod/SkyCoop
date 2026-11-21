@@ -1312,24 +1312,39 @@ namespace SkyCoop
             public List<GameObject> m_ClothingMeshes = new List<GameObject>();
 
 
-            float s_DeltaMultiplayer = 20;
-            float s_InterpolationSkipDistance = 3f;
             float s_InActiveCooldown = 5f;
 
+            // Buffered movement from ClientTransform packets, rendered with a small delay (see RemoteMotion).
+            public RemoteMotion m_Motion = new RemoteMotion();
+
+            [Il2CppInterop.Runtime.Attributes.HideFromIl2Cpp]
+            public void PushTransform(double senderTime, Vector3 position, Quaternion rotation, float tilt)
+            {
+                m_Position = position;
+                m_Rotation = rotation;
+                m_Motion.Push(senderTime, position, rotation, tilt);
+            }
+
+            // The setters below come from server-side teleports (respawn, scene spawn point) and from
+            // the snapshot a joining player gets. Show them at once and drop buffered motion,
+            // otherwise the model would slide from its old spot.
             public void SetTransform(Vector3 position, Quaternion rotation)
             {
                 m_Position = position;
                 m_Rotation = rotation;
+                m_Motion.Clear();
             }
 
             public void SetPosition(Vector3 position)
             {
                 m_Position = position;
+                m_Motion.Clear();
             }
 
             public void SetRotation(Quaternion rotation)
             {
                 m_Rotation = rotation;
+                m_Motion.Clear();
             }
 
             public void SetTilt(float tilt)
@@ -1339,6 +1354,13 @@ namespace SkyCoop
 
             public void SetVisibile(bool Visible)
             {
+                // Scene notifications repeat, so reset only on the hidden -> visible transition:
+                // anything buffered while hidden is stale.
+                if (Visible && !gameObject.activeSelf)
+                {
+                    m_Motion.Clear();
+                }
+
                 gameObject.SetActive(Visible);
 
                 if (!BuildInfo.ModAuthor.StartsWith("F") || !BuildInfo.ModAuthor.EndsWith("t"))
@@ -2169,7 +2191,12 @@ namespace SkyCoop
 
             public void UpdateAnimations()
             {
-                Vector3 Speed = (gameObject.transform.position - m_LastPosition) / Time.deltaTime;
+                // Network players use the velocity of the interpolated movement. Frame-to-frame
+                // displacement flickered between zero and double speed whenever a frame got zero or
+                // two network updates, which made IsMoving and footsteps stutter.
+                Vector3 Speed = m_PlayerID != -1
+                    ? m_Motion.Velocity
+                    : (gameObject.transform.position - m_LastPosition) / Time.deltaTime;
                 Speed.y = 0;
                 Vector3 Direction = transform.InverseTransformDirection(Speed);
                 m_LastPosition = gameObject.transform.position;
@@ -2300,6 +2327,23 @@ namespace SkyCoop
 
             void Update()
             {
+                if (m_PlayerID != -1) // if not Victory Dummy
+                {
+                    // Snapshot interpolation. With nothing buffered (just spawned, or right after a
+                    // server teleport) show the last known transform as is.
+                    if (m_Motion.Sample(NetClock.Now))
+                    {
+                        transform.position = m_Motion.Position + GetOffset();
+                        transform.rotation = m_Motion.Rotation;
+                        m_Tilt = m_Motion.Tilt;
+                    }
+                    else
+                    {
+                        transform.position = m_Position + GetOffset();
+                        transform.rotation = m_Rotation;
+                    }
+                }
+
                 UpdateAnimations();
 
                 // Cause we no more broadcast all the players position constatly to all the clients.
@@ -2319,29 +2363,6 @@ namespace SkyCoop
                 if(m_CameraAttention && m_CameraAttention.m_OffsetTranform)
                 {
                     m_CameraAttention.m_OffsetTranform.position = new Vector3(m_CameraAttention.m_OffsetTranform.position.x, GetBone(m_Animator, HumanBodyBones.LeftEye).position.y, m_CameraAttention.m_OffsetTranform.position.z);
-                }
-
-                if(m_PlayerID != -1) // if not Victory Dummy
-                {
-                    Vector3 TargetPosition = m_Position + GetOffset();
-
-                    // That way, we can avoid stupid situations when previous position of the objects was too far away
-                    // would lead to character slide on high speed. This mostly noticable when player loads from Vector3.zero.
-                    if (Vector3.Distance(transform.position, TargetPosition) > s_InterpolationSkipDistance)
-                    {
-                        transform.position = Vector3.Lerp(transform.position, TargetPosition, Time.deltaTime * s_DeltaMultiplayer);
-                    }
-                    else
-                    {
-                        transform.position = TargetPosition;
-                    }
-
-                    //if (m_AudioSourceRadio && m_AudioSourceRadioBG)
-                    //{
-                    //    m_AudioSourceRadioBG.gameObject.SetActive(m_LastRadioSample != null);
-                    //}
-
-                    transform.rotation = Quaternion.Lerp(transform.rotation, m_Rotation, Time.deltaTime * s_DeltaMultiplayer);
                 }
             }
         }
