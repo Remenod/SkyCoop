@@ -64,6 +64,13 @@ namespace SkyCoopClient
             uConsole.RegisterCommand("checksave", new Action(CheckSave));
             uConsole.RegisterCommand("ripnaratives", new Action(RIPNaratives));
             uConsole.RegisterCommand("nextframe", new Action(NextFrame));
+            uConsole.RegisterCommand("guidcheck", new Action(GuidCheck));
+        }
+
+        // Full list of GUID problems in the loaded scenes (see GuidAudit), written to the log.
+        public static void GuidCheck()
+        {
+            SkyCoop.GuidAudit.Run(true);
         }
 
         public static void GiveIlegalGear()

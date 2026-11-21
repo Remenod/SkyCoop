@@ -92,6 +92,9 @@ namespace SkyCoopClient
                     }
                 }
                 s_FramesDelayBeforeSendNewScene = 2;
+
+                // Log GUID problems of this scene (duplicates, synced objects without GUID). Read-only.
+                SkyCoop.GuidAudit.Run(false);
             }
         }
         [HarmonyLib.HarmonyPatch(typeof(PrefabSpawn), "SpawnObject")]
