@@ -224,7 +224,6 @@ namespace SkyCoop
 
         public static void OnDisconnectConfirmed(SavingFlag Flag)
         {
-            s_SavingFlag = Flag;
             ModMain.s_MapEditor = false;
             DebugGUI.s_Open = false;
             PlayersManager.DestoryPlayers();
@@ -245,6 +244,9 @@ namespace SkyCoop
 
             if (ModMain.IsGameplayScene())
             {
+                // SaveCompletedInternal acts on the flag at the next completed save, so set it only when a save
+                // follows. Set from the menu, it would throw the player out at the first autosave of the next game.
+                s_SavingFlag = Flag;
                 if (Flag != SavingFlag.Quit)
                 {
                     RemovePleaseWait();
