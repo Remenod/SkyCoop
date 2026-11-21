@@ -397,10 +397,14 @@ namespace SkyCoop
                                     }
                                 }
                             }
-                            if (m_LocalPlayerData.m_GearName != HoldingGear)
+                            // Variant carries the light state (RemoteLightSource modes), so lighting or
+                            // switching off the item in hands is sent too, not only a change of item.
+                            int HoldingVariant = RemoteLightSource.GetHeldMode(Gi);
+                            if (m_LocalPlayerData.m_GearName != HoldingGear || m_LocalPlayerData.m_GearVariant != HoldingVariant)
                             {
                                 m_LocalPlayerData.m_GearName = HoldingGear;
-                                ClientSend.SendHoldingGear(HoldingGear, m_LocalPlayerData.m_GearVariant);
+                                m_LocalPlayerData.m_GearVariant = HoldingVariant;
+                                ClientSend.SendHoldingGear(HoldingGear, HoldingVariant);
                             }
                             if (m_LocalPlayerData.m_LastSentCrouch != PM.PlayerIsCrouched())
                             {

@@ -57,6 +57,7 @@ namespace SkyCoop
             ClassInjector.RegisterTypeInIl2Cpp<GearCookingVisual>();
             ClassInjector.RegisterTypeInIl2Cpp<CookingSlotVisual>();
             ClassInjector.RegisterTypeInIl2Cpp<BaseAiHook>();
+            ClassInjector.RegisterTypeInIl2Cpp<RemoteLightSource>();
         }
 
         public class UiButtonPressHook : MonoBehaviour
@@ -1421,6 +1422,16 @@ namespace SkyCoop
                     }
                     
                     Gear.gameObject.SetActive(Gear.m_GearName == GearName);
+
+                    if (Gear.m_GearName == GearName)
+                    {
+                        // Lit state of a lamp, flashlight, torch, flare or match (see RemoteLightSource).
+                        RemoteLightSource LightRig = Gear.GetComponent<RemoteLightSource>();
+                        if (LightRig)
+                        {
+                            LightRig.SetMode(GearVariant);
+                        }
+                    }
                 }
             }
 
@@ -1621,6 +1632,8 @@ namespace SkyCoop
                 AddPlaceholderHoldingGear(this, "GEAR_PackMatches");
 
                 AddPlaceholderHoldingGear(this, "GEAR_KeroseneLampB", GearHandPose.Lantern);
+                // Hand offsets are not tuned yet; the beam itself follows the holder's view (RemoteLightSource.LateUpdate).
+                AddPlaceholderHoldingGear(this, "GEAR_Flashlight", GearHandPose.Pistol);
                 AddPlaceholderHoldingGear(this, "GEAR_BlueFlare");
                 AddPlaceholderHoldingGear(this, "GEAR_FlareA");
                 AddPlaceholderHoldingGear(this, "GEAR_Torch");
@@ -1830,13 +1843,19 @@ namespace SkyCoop
                     GameObject Gear;
                     if (Bogus)
                     {
-                        Gear = AssetManager.CreateBogusGear(GearName, null, true);
+                        Gear = AssetManager.CreateBogusGear(GearName, null, true, true);
                         if (Gear)
                         {
                             Gear.transform.SetParent(RightHand);
                             Gear.transform.localPosition = LocalPosition;
                             Gear.transform.SetLocalEulerAngles(LocalRotation, RotationOrder.OrderXYZ);
                             Gear.SetActive(false);
+
+                            RemoteLightSource LightRig = Gear.GetComponent<RemoteLightSource>();
+                            if (LightRig)
+                            {
+                                LightRig.m_Holder = Player;
+                            }
                         }
                     } else
                     {
