@@ -898,8 +898,10 @@ namespace SkyCoopClient
                             break;
                     }
                 }
-                // Lit kerosene lamp or flashlight left on the ground (no effect on other items).
+                // Lit kerosene lamp or flashlight left on the ground (no effect on other items),
+                // and when its fuel or battery runs out, like TimeFinishAt of torches and flares above.
                 Style = SkyCoop.RemoteLightSource.GetDroppedStyle(gear, Style);
+                TimeFinishAt = SkyCoop.RemoteLightSource.GetDroppedFinishTime(gear, Style, TimeFinishAt);
 
                 Vector3 v3 = gear.gameObject.transform.position;
                 Quaternion rot = gear.gameObject.transform.rotation;
@@ -1113,6 +1115,7 @@ namespace SkyCoopClient
                 SkyCoop.RemoteLightSource LightRig = GearComp.GetComponent<SkyCoop.RemoteLightSource>();
                 if (LightRig)
                 {
+                    LightRig.m_FinishAt = Data.m_FinishProcessTime;
                     LightRig.SetMode(Data.m_Style);
                 }
 
@@ -1326,6 +1329,10 @@ namespace SkyCoopClient
 
                 //SkyCoop.Logger.Log(ConsoleColor.Green, "JSON " + JSON);
                 Gi.Deserialize(DataProxy, true);
+
+                // The server keeps the item as it was when dropped: burn the fuel, battery or burn time
+                // a lit lamp, flashlight, torch or flare used while it lay on the ground.
+                SkyCoop.RemoteLightSource.ApplyTimeOnGround(Gi, Data.m_GUID);
 
                 if (Gi.m_Bed)
                 {
@@ -1650,6 +1657,7 @@ namespace SkyCoopClient
                         s_LastGearTimeBeingCooked = 0;
                     }
                     s_LastPickedGearGUID = Visual.m_GUID;
+                    SkyCoop.RemoteLightSource.RememberPickup(Visual); // Lit time on the ground, applied in ProcessGearPickUpQueue.
                     ClientSend.SendGearPickUp(Visual.m_GUID);
                 }
             }

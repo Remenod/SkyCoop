@@ -126,6 +126,7 @@ namespace SkyCoop
                     RemoteLightSource LightRig = RemoteLightSource.TryAttach(GearObject, Prefab, false);
                     if (LightRig)
                     {
+                        LightRig.m_FinishAt = TimeFinishAt; // Fuel or battery runs out then (0 = never).
                         LightRig.SetMode(Style);
                     }
 

@@ -51,11 +51,20 @@ namespace SkyCoop
             public string m_Path;
         }
 
+        private class GroundRecord
+        {
+            public float m_DroppedAt;
+            public float m_FinishAt;
+            public int m_Style;
+        }
+
         public LightKind m_Kind = LightKind.None;
         public string m_GearName = "";
         public bool m_Held = false;
         public int m_Mode = -1;
         public Comps.NetworkPlayer m_Holder = null;
+        // Ground only: server time (in-game hours) when the fuel, battery or burn time runs out. 0 = never.
+        public float m_FinishAt = 0;
 
         private readonly List<Beam> m_Beams = new List<Beam>();
         private readonly List<GameObject> m_LitOnly = new List<GameObject>();
@@ -64,8 +73,22 @@ namespace SkyCoop
         private float m_NextEnvironmentCheck = 0;
         private float m_DiagnoseAt = -1;
         private bool m_Failed = false;
+        private HeatSource m_Heat = null;
+        private bool m_HasHeat = false;
+        private float m_HeatMaxIncrease = 0;
+        private float m_HeatInnerRadius = 0;
+        private float m_HeatOuterRadius = 0;
+        private float m_HeatMinutesToMax = 1;
 
         private static readonly HashSet<string> s_Diagnosed = new HashSet<string>();
+        // Light sources the local player is picking up from the ground, by GUID (see RememberPickup).
+        private static readonly Dictionary<string, GroundRecord> s_Pickups = new Dictionary<string, GroundRecord>();
+
+        /// <summary>Server time in in-game hours, the same clock as dropped and finish times. 0 if not known yet.</summary>
+        private static float ServerTime()
+        {
+            return ModMain.Client != null ? ModMain.Client.m_LastServerTime : 0f;
+        }
 
         // ---------------------------------------------------------------- Sender side
 
@@ -135,6 +158,152 @@ namespace SkyCoop
             return CurrentStyle;
         }
 
+        /// <summary>
+        /// Server time when a dropped lit lamp runs out of fuel or a lit flashlight out of battery, so other
+        /// clients can switch it off like a torch. Other items keep the given value (torches and flares set their own).
+        /// </summary>
+        [HideFromIl2Cpp]
+        public static float GetDroppedFinishTime(GearItem Gear, int Style, float CurrentFinishAt)
+        {
+            float Now = ServerTime();
+            if (!Gear || Style <= c_ModeOff || Now <= 0f)
+            {
+                return CurrentFinishAt;
+            }
+            try
+            {
+                KeroseneLampItem Lamp = Gear.GetComponent<KeroseneLampItem>();
+                if (Lamp)
+                {
+                    float BurnPerHour = Lamp.GetModifiedFuelBurnLitersPerHour().m_Units;
+                    if (BurnPerHour > 0f)
+                    {
+                        return Now + Lamp.m_CurrentFuelLiters.m_Units / BurnPerHour;
+                    }
+                    return CurrentFinishAt;
+                }
+                FlashlightItem Flashlight = Gear.GetComponent<FlashlightItem>();
+                if (Flashlight)
+                {
+                    // Beam durations are in hours (low 1 h, high 5 min) for a full charge.
+                    float Duration = Style == c_ModeHigh ? Flashlight.m_HighBeamDuration : Flashlight.m_LowBeamDuration;
+                    return Now + Flashlight.GetNormalizedCharge() * Duration;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Log(ConsoleColor.Red, $"[RemoteLight] GetDroppedFinishTime failed for {Gear.name}: {e.Message}");
+            }
+            return CurrentFinishAt;
+        }
+
+        /// <summary>
+        /// Called when the local player starts picking up a ground item: remembers how long it has been lying
+        /// there lit, because the item data on the server is the state from the moment it was dropped.
+        /// </summary>
+        [HideFromIl2Cpp]
+        public static void RememberPickup(Comps.DroppedGearVisual Visual)
+        {
+            if (!Visual || string.IsNullOrEmpty(Visual.m_GUID) || Visual.m_Style <= c_ModeOff)
+            {
+                return;
+            }
+            if (s_Pickups.Count > 64)
+            {
+                s_Pickups.Clear(); // Entries of failed pickups are never consumed.
+            }
+            s_Pickups[Visual.m_GUID] = new GroundRecord
+            {
+                m_DroppedAt = Visual.m_DroppedTime,
+                m_FinishAt = Visual.m_FinishProcessAt,
+                m_Style = Visual.m_Style,
+            };
+        }
+
+        /// <summary>
+        /// Called right after a picked up item is deserialized: burns the fuel, battery or burn time it used
+        /// while it lay lit on the ground (lamp, flashlight, torch, flare).
+        /// </summary>
+        [HideFromIl2Cpp]
+        public static void ApplyTimeOnGround(GearItem Gear, string GUID)
+        {
+            if (!Gear || string.IsNullOrEmpty(GUID))
+            {
+                return;
+            }
+            GroundRecord Record;
+            if (!s_Pickups.TryGetValue(GUID, out Record))
+            {
+                return;
+            }
+            s_Pickups.Remove(GUID);
+
+            float Now = ServerTime();
+            if (Now <= 0f || Record.m_DroppedAt <= 0f)
+            {
+                return;
+            }
+            float End = Record.m_FinishAt > 0f ? Mathf.Min(Now, Record.m_FinishAt) : Now;
+            float Hours = End - Record.m_DroppedAt;
+            if (Hours <= 0f)
+            {
+                return;
+            }
+
+            try
+            {
+                KeroseneLampItem Lamp = Gear.GetComponent<KeroseneLampItem>();
+                if (Lamp)
+                {
+                    if (Record.m_Style == c_ModeLit)
+                    {
+                        Lamp.ReduceFuel(Hours);
+                        Logger.Log(ConsoleColor.Cyan, $"[RemoteLight] {Gear.name} burned {Hours:F2} h of fuel on the ground, {Lamp.GetPercentFuelRemaining():F0}% left");
+                    }
+                    return;
+                }
+                FlashlightItem Flashlight = Gear.GetComponent<FlashlightItem>();
+                if (Flashlight)
+                {
+                    float Duration = Record.m_Style == c_ModeHigh ? Flashlight.m_HighBeamDuration : Flashlight.m_LowBeamDuration;
+                    float Charge = Flashlight.GetNormalizedCharge();
+                    if (Duration > 0f && Charge > 0f)
+                    {
+                        // Scale the raw charge, so its unit does not matter.
+                        float NewCharge = Mathf.Max(0f, Charge - Hours / Duration);
+                        Flashlight.m_CurrentBatteryCharge *= NewCharge / Charge;
+                        Logger.Log(ConsoleColor.Cyan, $"[RemoteLight] {Gear.name} used {Hours:F2} h of battery on the ground, charge {Charge:F2} -> {NewCharge:F2}");
+                    }
+                    return;
+                }
+                // Torch and flare styles: 1 burning, 2 burnt out (see GearsSync.SendDropItem).
+                TorchItem Torch = Gear.GetComponent<TorchItem>();
+                if (Torch)
+                {
+                    if (Record.m_Style == 1)
+                    {
+                        Torch.m_ElapsedBurnMinutes = Mathf.Min(Torch.m_ElapsedBurnMinutes + Hours * 60f, Torch.GetModifiedBurnLifetimeMinutes());
+                        Logger.Log(ConsoleColor.Cyan, $"[RemoteLight] {Gear.name} burned {Hours * 60f:F0} min on the ground");
+                    }
+                    return;
+                }
+                FlareItem Flare = Gear.GetComponent<FlareItem>();
+                if (Flare)
+                {
+                    if (Record.m_Style == 1)
+                    {
+                        Flare.m_ElapsedBurnMinutes = Mathf.Min(Flare.m_ElapsedBurnMinutes + Hours * 60f, Flare.GetModifiedBurnLifetimeMinutes());
+                        Logger.Log(ConsoleColor.Cyan, $"[RemoteLight] {Gear.name} burned {Hours * 60f:F0} min on the ground");
+                    }
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Log(ConsoleColor.Red, $"[RemoteLight] ApplyTimeOnGround failed for {Gear.name}: {e.Message}");
+            }
+        }
+
         // ---------------------------------------------------------------- Setup
 
         /// <summary>
@@ -170,6 +339,17 @@ namespace SkyCoop
                 Rig.m_Held = Held;
                 Rig.BuildBeams(Root);
                 Rig.CollectLights(Root, Prefab);
+                // Kept on placeholders by the strip whitelists in AssetManager (lamp, torch, flare have one).
+                // Its settings are cached: the stripped lamp item may destroy it (KeroseneLampItem.DestroyHeatSource).
+                Rig.m_Heat = Root.GetComponent<HeatSource>();
+                if (Rig.m_Heat)
+                {
+                    Rig.m_HasHeat = true;
+                    Rig.m_HeatMaxIncrease = Rig.m_Heat.m_MaxTempIncrease;
+                    Rig.m_HeatInnerRadius = Rig.m_Heat.m_MaxTempIncreaseInnerRadius;
+                    Rig.m_HeatOuterRadius = Rig.m_Heat.m_MaxTempIncreaseOuterRadius;
+                    Rig.m_HeatMinutesToMax = Rig.m_Heat.m_TimeToReachMaxTempMinutes;
+                }
                 Rig.DisableGameLightDrivers(Root);
                 Rig.ApplyMode(c_ModeOff, true);
                 return Rig;
@@ -391,8 +571,19 @@ namespace SkyCoop
             ApplyMode(Mode, false);
         }
 
+        /// <summary>A lamp or flashlight on the ground whose fuel or battery has run out by now.</summary>
+        private bool IsBurntOut()
+        {
+            float Now = ServerTime();
+            return !m_Held && m_FinishAt > 0f && Now > 0f && Now >= m_FinishAt;
+        }
+
         private void ApplyMode(int Mode, bool Force)
         {
+            if (Mode > c_ModeOff && IsBurntOut())
+            {
+                Mode = c_ModeOff;
+            }
             if (Mode == m_Mode && !Force)
             {
                 return;
@@ -404,6 +595,7 @@ namespace SkyCoop
                 m_Outdoor = IsOutdoorLighting();
                 RefreshObjects();
                 ApplyIntensities();
+                ApplyHeat();
 
                 if (m_Mode > c_ModeOff)
                 {
@@ -517,6 +709,79 @@ namespace SkyCoop
             }
         }
 
+        /// <summary>
+        /// Lamps, torches and flares warm whoever stands next to them (+3 C, within 2 m in the prefabs),
+        /// so the copy of another player's item does the same. Only while lit and visible: a hidden
+        /// placeholder stays parented to the hand and would otherwise heat from nowhere.
+        /// </summary>
+        private void ApplyHeat()
+        {
+            if (!m_HasHeat)
+            {
+                return;
+            }
+            try
+            {
+                bool On = m_Mode > c_ModeOff && isActiveAndEnabled;
+                if (!m_Heat)
+                {
+                    if (!On)
+                    {
+                        return;
+                    }
+                    // Destroyed together with the stripped item component: put an equal one back.
+                    m_Heat = gameObject.AddComponent<HeatSource>();
+                    m_Heat.m_MaxTempIncrease = m_HeatMaxIncrease;
+                    m_Heat.m_MaxTempIncreaseInnerRadius = m_HeatInnerRadius;
+                    m_Heat.m_MaxTempIncreaseOuterRadius = m_HeatOuterRadius;
+                    m_Heat.m_TimeToReachMaxTempMinutes = m_HeatMinutesToMax;
+                }
+                if (On && !m_Heat.IsTurnedOn())
+                {
+                    m_Heat.TurnOn();
+                }
+                else if (!On && m_Heat.IsTurnedOn())
+                {
+                    m_Heat.TurnOffImmediate();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Log(ConsoleColor.Yellow, $"[RemoteLight] Heat source failed on {m_GearName}, heat disabled: {e.Message}");
+                m_HasHeat = false;
+                m_Heat = null;
+            }
+        }
+
+        void OnEnable()
+        {
+            // HeatSource.Start may reset its state on first activation; Update re-applies it every 0.5 s too.
+            if (!m_Failed)
+            {
+                ApplyHeat();
+            }
+        }
+
+        void OnDisable()
+        {
+            if (!m_Heat)
+            {
+                return;
+            }
+            try
+            {
+                if (m_Heat.IsTurnedOn())
+                {
+                    m_Heat.TurnOffImmediate();
+                }
+            }
+            catch
+            {
+                m_HasHeat = false;
+                m_Heat = null;
+            }
+        }
+
         private static bool IsOutdoorLighting()
         {
             try
@@ -546,8 +811,13 @@ namespace SkyCoop
                 if (Time.time >= m_NextEnvironmentCheck)
                 {
                     m_NextEnvironmentCheck = Time.time + 0.5f;
+                    if (m_Mode > c_ModeOff && IsBurntOut())
+                    {
+                        ApplyMode(c_ModeOff, false);
+                    }
                     m_Outdoor = IsOutdoorLighting();
                     RefreshObjects();
+                    ApplyHeat();
                 }
                 if (m_Mode <= c_ModeOff)
                 {
@@ -601,6 +871,7 @@ namespace SkyCoop
             {
                 System.Text.StringBuilder Sb = new System.Text.StringBuilder();
                 Sb.Append($"[RemoteLight] {m_GearName} kind={m_Kind} {(m_Held ? "held" : "ground")} mode={m_Mode} outdoor={m_Outdoor} beams={m_Beams.Count}");
+                Sb.Append($" heat={(m_Heat ? (m_Heat.IsTurnedOn() ? "on" : "off") : "none")} finishAt={m_FinishAt:F2} now={ServerTime():F2}");
                 for (int i = 0; i < m_Beams.Count; i++)
                 {
                     Beam B = m_Beams[i];
