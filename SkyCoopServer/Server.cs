@@ -90,6 +90,7 @@ namespace SkyCoopServer
             { (int)Packet.Type.ClientSV_CMD, ServerHandle.ClientSV_CMD },
             { (int)Packet.Type.ClientSquadHealth, ServerHandle.ClientSquadHealth },
             { (int)Packet.Type.ClientTilt, ServerHandle.ClientTilt },
+            { (int)Packet.Type.ClientTransform, ServerHandle.ClientTransform },
             { (int)Packet.Type.ClientRequestPresent, ServerHandle.ClientRequestPresent },
             { (int)Packet.Type.ClientRequestNewSquad, ServerHandle.ClientRequestNewSquad },
             { (int)Packet.Type.ClientRequestLeaveSquad, ServerHandle.ClientRequestLeaveSquad },

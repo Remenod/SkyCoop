@@ -187,6 +187,48 @@ namespace SkyCoopServer
             }
         }
 
+        // Movement tick from the ClientTransform packet. Keeps the semantics of
+        // PlayerMoved/PlayerRotated/PlayerTilted: rotation and tilt are always stored,
+        // position only while alive, and nothing is broadcast unless alive.
+        // Stale packets never get here: both hops are DeliveryMethod.Sequenced.
+        public void PlayerTransformed(int Index, double SenderTime, Vector3 Position, Quaternion Rotation, float Tilt)
+        {
+            DataStr.PlayerData Player = GetPlayer(Index);
+            if (Player == null)
+            {
+                return;
+            }
+
+            Player.m_Rotation = Rotation;
+            Player.m_Tilt = Tilt;
+
+            if (Player.m_GamePlayState != PlayerData.GamePlayState.Alive)
+            {
+                return;
+            }
+
+            Player.m_Position = Position;
+
+            if (s_Server == null)
+            {
+                return;
+            }
+
+            List<NetPeer> Recipients = new List<NetPeer>();
+            foreach (DataStr.PlayerData OnScenePlayer in GetPlayersOnScene(Player.m_Scene))
+            {
+                if (OnScenePlayer.m_PlayerID != Player.m_PlayerID || m_RecursiveDebug)
+                {
+                    NetPeer Client = s_Server.GetClient(OnScenePlayer.m_PlayerID);
+                    if (Client != null)
+                    {
+                        Recipients.Add(Client);
+                    }
+                }
+            }
+            ServerSend.SendTransform(Recipients, Player.m_PlayerID, SenderTime, Position, Rotation, Tilt);
+        }
+
         public void PlayerTilted(int Index, float Tilt, bool Broadcast = true)
         {
             DataStr.PlayerData Player = GetPlayer(Index);

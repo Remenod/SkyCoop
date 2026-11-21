@@ -112,6 +112,7 @@ namespace SkyCoopServer
             ClientAnimalAddArrow,
             ClientRequestAnimalArrows,
             ClientAnimalCorpse,
+            ClientTransform, // sender clock, position, rotation, camera tilt; replaces ClientPosition/ClientRotation/ClientTilt for movement
         }
 
         public enum SquadResponce
@@ -130,7 +131,9 @@ namespace SkyCoopServer
             YouInvitedTooMuch,
         }
 
-        public const string c_Key = "public2";
+        // Change this whenever the wire protocol changes, so mismatched builds refuse to connect
+        // instead of silently desyncing. "netsync1": player movement moved to the ClientTransform packet.
+        public const string c_Key = "public2-netsync1";
 
         public enum TypeVoice
         {

@@ -147,6 +147,21 @@ namespace SkyCoop
             }
         }
 
+        public static void ClientTransform(NetDataReader Reader)
+        {
+            int PlayerID = Reader.GetInt();
+            double SenderTime = Reader.GetDouble();
+            Vector3 Position = Reader.GetVector3Unity();
+            Quaternion Rotation = Reader.GetQuaternionUnity();
+            float Tilt = Reader.GetFloat();
+
+            Comps.NetworkPlayer Player = PlayersManager.GetPlayer(PlayerID);
+            if (Player)
+            {
+                Player.PushTransform(SenderTime, Position, Rotation, Tilt);
+            }
+        }
+
         public static void ClientSceneNotification(NetDataReader Reader)
         {
             int PlayerID = Reader.GetInt();

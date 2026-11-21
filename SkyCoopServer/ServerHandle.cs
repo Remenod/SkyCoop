@@ -55,6 +55,15 @@ namespace SkyCoopServer
             ServerInstance.m_PlayersData.PlayerRotated(Client.Id, Rotation);
         }
 
+        public static void ClientTransform(NetPeer Client, NetDataReader Reader, Server ServerInstance)
+        {
+            double SenderTime = Reader.GetDouble();
+            Vector3 Position = Reader.GetVector3();
+            Quaternion Rotation = Reader.GetQuaternion();
+            float Tilt = Reader.GetFloat();
+            ServerInstance.m_PlayersData.PlayerTransformed(Client.Id, SenderTime, Position, Rotation, Tilt);
+        }
+
         public static void ClientScene(NetPeer Client, NetDataReader Reader, Server ServerInstance)
         {
             Logger.Log(ConsoleColor.Red, $"[ServerHandle] (ClientScene) Client {Client.Id} sent Legacy scene change packet!");

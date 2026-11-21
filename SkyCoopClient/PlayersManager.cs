@@ -37,6 +37,7 @@ namespace SkyCoop
             public Vector3 m_LastSentPosition = Vector3.zero;
             public Quaternion m_LastSentRotation = Quaternion.identity;
             public float m_LastSentTilt = 0;
+            public double m_LastTransformSend = double.NegativeInfinity; // NetClock seconds
 
             public string m_GearName = "";
             public int m_GearVariant = 0;
@@ -315,6 +316,10 @@ namespace SkyCoop
             return "";
         }
 
+        // Movement ticks per second. The receiver renders RemoteMotion.InterpolationDelay (0.1 s)
+        // behind the newest tick, which is three ticks at this rate.
+        public const double c_TransformSendRate = 30;
+
         public static void UpdateLocalPlayer()
         {
             if(!GameManager.s_IsGameplaySuspended)
@@ -340,44 +345,31 @@ namespace SkyCoop
                             }
                         }
 
+                        Vector3 SendPosition = T.position;
+                        Quaternion SendRotation = T.rotation;
+
                         if (BedTransfrorm)
                         {
-                            Vector3 BedPosition = BedTransfrorm.position;
-                            Quaternion BedRotation = BedTransfrorm.rotation * Quaternion.Euler(0, -180, 0);
-
-                            if (m_LocalPlayerData.m_LastSentPosition != BedPosition)
-                            {
-                                m_LocalPlayerData.m_LastSentPosition = BedPosition;
-                                ClientSend.SendPosition(BedPosition);
-                            }
-                            if (m_LocalPlayerData.m_LastSentRotation != BedRotation)
-                            {
-                                m_LocalPlayerData.m_LastSentRotation = BedRotation;
-                                ClientSend.SendRotation(BedRotation);
-                            }
-                        }
-                        else
-                        {
-                            if (m_LocalPlayerData.m_LastSentPosition != T.position)
-                            {
-                                m_LocalPlayerData.m_LastSentPosition = T.position;
-                                ClientSend.SendPosition(T.position);
-                            }
-                            if (m_LocalPlayerData.m_LastSentRotation != T.rotation)
-                            {
-                                m_LocalPlayerData.m_LastSentRotation = T.rotation;
-                                ClientSend.SendRotation(T.rotation);
-                            }
+                            SendPosition = BedTransfrorm.position;
+                            SendRotation = BedTransfrorm.rotation * Quaternion.Euler(0, -180, 0);
                         }
 
                         vp_FPSCamera Cam = GameManager.GetVpFPSCamera();
                         if (Cam)
                         {
-                            if(m_LocalPlayerData.m_LastSentTilt != GameManager.GetVpFPSCamera().transform.localEulerAngles.x)
-                            {
-                                m_LocalPlayerData.m_LastSentTilt = GameManager.GetVpFPSCamera().transform.localEulerAngles.x;
-                                ClientSend.SendTilt(m_LocalPlayerData.m_LastSentTilt);
-                            }
+                            m_LocalPlayerData.m_LastSentTilt = Cam.transform.localEulerAngles.x;
+                        }
+
+                        // Fixed rate, whether or not anything changed: the receiver interpolates between
+                        // timestamped samples, and a gap in the stream then reliably means a pause.
+                        // The 0.9 lets a tick go out on the frame closest to the interval instead of the one after.
+                        double Now = NetClock.Now;
+                        if (Now - m_LocalPlayerData.m_LastTransformSend >= 0.9 / c_TransformSendRate)
+                        {
+                            m_LocalPlayerData.m_LastTransformSend = Now;
+                            m_LocalPlayerData.m_LastSentPosition = SendPosition;
+                            m_LocalPlayerData.m_LastSentRotation = SendRotation;
+                            ClientSend.SendTransform(Now, SendPosition, SendRotation, m_LocalPlayerData.m_LastSentTilt);
                         }
 
                         

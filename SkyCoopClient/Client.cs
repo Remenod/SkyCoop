@@ -80,6 +80,7 @@ namespace SkyCoop
             { (int)Packet.Type.ClientSquadHealth, ClientHandle.ClientSquadHealth },
             { (int)Packet.Type.ServerRequestSquadHealth, ClientHandle.ServerRequestSquadHealth },
             { (int)Packet.Type.ClientTilt, ClientHandle.ClientTilt },
+            { (int)Packet.Type.ClientTransform, ClientHandle.ClientTransform },
             { (int)Packet.Type.ServerSquadEliminated, ClientHandle.ServerSquadEliminated },
             { (int)Packet.Type.ServerGearSpawnerMarker, ClientHandle.ServerGearSpawnerMarker },
             { (int)Packet.Type.ServerSquadMemberLeft, ClientHandle.ServerSquadMemberLeft },
@@ -261,6 +262,12 @@ namespace SkyCoop
                         ExecutePacketEvent(PacketID, dataReader);
                         dataReader.Recycle();
                     }
+                    else if (PacketID == (int)Packet.Type.ClientTransform)
+                    {
+                        // Movement ticks go stale in milliseconds; replaying a backlog later would only
+                        // replay old motion. The stream resumes on its own once we are ready.
+                        dataReader.Recycle();
+                    }
                     else
                     {
                         m_DelayedPackage.Add(new DelayedPackage(PacketID, dataReader));
@@ -303,9 +310,14 @@ namespace SkyCoop
 
         public void SendToHost(NetDataWriter writer)
         {
+            SendToHost(writer, DeliveryMethod.ReliableOrdered);
+        }
+
+        public void SendToHost(NetDataWriter writer, DeliveryMethod Method)
+        {
             if (m_Instance != null && m_HostEndPoint != null)
             {
-                m_HostEndPoint.Send(writer, DeliveryMethod.ReliableOrdered);
+                m_HostEndPoint.Send(writer, Method);
             }
         }
 

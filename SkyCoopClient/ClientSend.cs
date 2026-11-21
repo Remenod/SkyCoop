@@ -33,6 +33,25 @@ namespace SkyCoop
             SendToHost(writer);
         }
 
+        // Position, rotation and camera tilt in one packet, stamped with the sender's NetClock so the
+        // receiver can interpolate on real sample times. Sequenced: a lost tick is simply skipped
+        // (the next one supersedes it) and never holds up reliable traffic.
+        public static void SendTransform(double SenderTime, Vector3 Position, Quaternion Rotation, float Tilt)
+        {
+            if (ModMain.Client == null || ModMain.Client.m_Instance == null)
+            {
+                return;
+            }
+
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put((int)Packet.Type.ClientTransform);
+            writer.Put(SenderTime);
+            writer.Put(Position);
+            writer.Put(Rotation);
+            writer.Put(Tilt);
+            ModMain.Client.SendToHost(writer, LiteNetLib.DeliveryMethod.Sequenced);
+        }
+
         public static void SendRotation(Quaternion Rotation)
         {
             NetDataWriter writer = new NetDataWriter();

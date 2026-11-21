@@ -51,6 +51,29 @@ namespace SkyCoopServer
             Client.Send(writer, DeliveryMethod.Unreliable);
         }
 
+        // One packet per movement tick. Sequenced: late packets are dropped instead of
+        // snapping the model back, and loss never stalls the reliable traffic.
+        public static void SendTransform(List<NetPeer> Clients, int FromClient, double SenderTime, Vector3 Position, Quaternion Rotation, float Tilt)
+        {
+            if (Clients.Count == 0)
+            {
+                return;
+            }
+
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put((int)Packet.Type.ClientTransform);
+            writer.Put(FromClient);
+            writer.Put(SenderTime);
+            writer.Put(Position);
+            writer.Put(Rotation);
+            writer.Put(Tilt);
+
+            foreach (NetPeer Client in Clients)
+            {
+                Client.Send(writer, DeliveryMethod.Sequenced);
+            }
+        }
+
         public static void SendPlayerSceneNotification(NetPeer Client, bool Present, int FromClient)
         {
             NetDataWriter writer = new NetDataWriter();
